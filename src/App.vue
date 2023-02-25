@@ -42,8 +42,8 @@ const assignHoles = () => {
   }
 };
 
-onMounted(async () => {
-  await fillGridStructure();
+onMounted(() => {
+  fillGridStructure();
   assignHoles();
 });
 </script>
