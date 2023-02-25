@@ -1,10 +1,36 @@
 <script setup>
+import { ref, onMounted } from 'vue';
+
+const gridStructure = ref([]);
+
+const cellModel = ref({
+  value: 2,
+  isHole: false,
+});
+
+const rows = ref(3);
+const cols = ref(3);
+const holes = ref(2);
+
+const fillGridStructure = () => {
+  for (let r = 0; r < rows.value; r++) {
+    gridStructure.value[r] = [];
+
+    for (let c = 0; c < cols.value; c++) {
+      gridStructure.value[r].push(cellModel.value);
+    }
+  }
+};
+
+onMounted(() => {
+  fillGridStructure();
+});
 </script>
 
 <template>
-  <header></header>
+  <header>MineSweeper</header>
 
-  <main></main>
+  <main>main</main>
 </template>
 
 <style scoped>
