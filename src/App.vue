@@ -7,6 +7,7 @@ const cellModel = ref({
   value: 0,
   isHole: false,
   id: null,
+  visible: false,
 });
 
 const rows = ref(5);
@@ -91,8 +92,29 @@ const checkCell = (rowCoordinate, colCoordinate) => {
   return holesCoordination.value.includes(`${rowCoordinate}-${colCoordinate}`) ? 1 : 0;
 };
 
-const handleClick = (cell) => {
-  console.log('handleClick', cell);
+const handleClick = (id) => {
+  gridStructure.value = gridStructure.value.map((row) => {
+    return row.map((col) => {
+      if (col.id === id) {
+        return {
+          ...col,
+          visible: true,
+        };
+      }
+
+      return col;
+    });
+  });
+};
+
+const formattedCellValue = (value) => {
+  return value ? value : '';
+};
+
+const cellColor = ({ visible, isHole }) => {
+  const holeTextColor = isHole ? 'text-red' : '';
+
+  return visible ? `grey-lighten-3 ${holeTextColor}` : 'grey-lighten-1';
 };
 
 onMounted(() => {
@@ -111,15 +133,19 @@ onMounted(() => {
       no-gutters
       dense
     >
-      <v-col v-for="cell in row" :key="cell.id">
+      <v-col v-for="cell in row" :key="cell">
         <v-sheet
           class="d-flex align-center justify-center pa-2 ma-0 font-weight-bold"
           border
           min-width="90"
           min-height="50"
-          @click="handleClick(cell)"
+          style="cursor: pointer"
+          :color="cellColor(cell)"
+          @click="handleClick(cell.id)"
         >
-          {{ cell.value }}
+          <template v-if="cell.visible">
+            {{ formattedCellValue(cell.value) }}
+          </template>
         </v-sheet>
       </v-col>
     </v-row>
