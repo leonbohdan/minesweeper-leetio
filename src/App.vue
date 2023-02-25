@@ -12,7 +12,7 @@ const cellModel = ref({
 
 const rows = ref(5);
 const cols = ref(5);
-const holes = ref(3);
+const holes = ref(10);
 const holesCoordination = ref([]);
 
 const fillGridStructure = () => {
@@ -124,7 +124,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <header>MineSweeper</header>
+  <header>
+    <h1>
+      HolesSweeper
+    </h1>
+
+    <div>
+      Holes: <b>{{ holes }}</b>
+    </div>
+  </header>
 
   <main>
     <v-row
@@ -165,6 +173,9 @@ header {
 @media (min-width: 1024px) {
   header {
     display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
     place-items: center;
     padding-right: calc(var(--section-gap) / 2);
   }
