@@ -10,9 +10,9 @@ const cellModel = ref({
   visible: false,
 });
 
-const rows = ref(5);
-const cols = ref(5);
-const holes = ref(10);
+const rows = ref(6);
+const cols = ref(6);
+const holes = ref(12);
 const holesCoordination = ref([]);
 
 const fillGridStructure = () => {
@@ -125,9 +125,9 @@ onMounted(() => {
 
 <template>
   <header>
-    <h1>
-      HolesSweeper
-    </h1>
+    <h2>
+      Hole Sweeper
+    </h2>
 
     <div>
       Holes: <b>{{ holes }}</b>
@@ -141,12 +141,12 @@ onMounted(() => {
       no-gutters
       dense
     >
-      <v-col v-for="cell in row" :key="cell">
+      <v-col v-for="cell in row" :key="cell" cols="2">
         <v-sheet
-          class="d-flex align-center justify-center pa-2 ma-0 font-weight-bold"
+          class="d-flex align-center justify-center pa-0 ma-0 font-weight-bold"
           border
-          min-width="90"
-          min-height="50"
+          min-width="40"
+          min-height="40"
           style="cursor: pointer"
           :color="cellColor(cell)"
           @click="handleClick(cell.id)"
