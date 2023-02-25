@@ -40,6 +40,51 @@ const assignHoles = () => {
       assignedHoles++;
     }
   }
+
+  handleAdjacentCells();
+};
+
+const handleAdjacentCells = () => {
+  for (let currentRow = 0; currentRow < rows.value; currentRow++) {
+    for (let currentCol = 0; currentCol < cols.value; currentCol++) {
+      if (!gridStructure.value[currentRow][currentCol].isHole) {
+        let holeCount = 0;
+        const adjacentCells = getAdjacentCells(currentRow, currentCol);
+
+        adjacentCells.forEach((cell, i) => {
+          if (adjacentCells[i].isHole) {
+            holeCount++;
+          }
+        });
+
+        gridStructure.value[currentRow][currentCol].value = holeCount;
+      }
+    }
+  }
+};
+
+const getAdjacentCells = (currentRow, currentCol) => {
+  const results = [];
+
+  for (
+    let rowPos = currentRow > 0 ? -1 : 0;
+    rowPos <= (currentRow < rows.value - 1 ? 1 : 0);
+    rowPos++
+  ) {
+    for (
+      let colPos = currentCol > 0 ? -1 : 0;
+      colPos <= (currentCol < cols.value - 1 ? 1 : 0);
+      colPos++
+    ) {
+      results.push(gridStructure.value[currentRow + rowPos][currentCol + colPos]);
+    }
+  }
+
+  return results;
+};
+
+const handleClick = (cell) => {
+  console.log('handleClick', cell);
 };
 
 onMounted(() => {
@@ -52,7 +97,25 @@ onMounted(() => {
   <header>MineSweeper</header>
 
   <main>
-    {{ gridStructure }}
+    <code>
+      {{ gridStructure }}
+    </code>
+
+    <v-row
+      v-for="(row, i) in gridStructure"
+      :key="i"
+      no-gutters
+    >
+      <v-col v-for="(cell, index) in row" :key="index">
+        <v-sheet
+          class="d-flex align-center justify-center pa-2 ma-2"
+          border
+          @click="handleClick(cell)"
+        >
+          {{ cell.value }}
+        </v-sheet>
+      </v-col>
+    </v-row>
   </main>
 </template>
 
