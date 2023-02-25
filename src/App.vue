@@ -6,18 +6,23 @@ const gridStructure = ref([]);
 const cellModel = ref({
   value: 0,
   isHole: false,
+  id: null,
 });
 
-const rows = ref(3);
-const cols = ref(3);
-const holes = ref(2);
+const rows = ref(5);
+const cols = ref(5);
+const holes = ref(3);
+const holesCoordination = ref([]);
 
 const fillGridStructure = () => {
   for (let r = 0; r < rows.value; r++) {
     gridStructure.value[r] = [];
 
     for (let c = 0; c < cols.value; c++) {
-      gridStructure.value[r].push(cellModel.value);
+      gridStructure.value[r].push({
+        ...cellModel.value,
+        id: `${r}-${c}`,
+      });
     }
   }
 };
@@ -33,9 +38,12 @@ const assignHoles = () => {
 
     if (!randomCell.isHole) {
       gridStructure.value[rowRandomIndex][colRandomIndex] = {
+        ...randomCell,
         isHole: true,
         value: 'H',
       };
+
+      holesCoordination.value.push(randomCell.id);
 
       assignedHoles++;
     }
@@ -45,42 +53,42 @@ const assignHoles = () => {
 };
 
 const handleAdjacentCells = () => {
-  for (let currentRow = 0; currentRow < rows.value; currentRow++) {
-    for (let currentCol = 0; currentCol < cols.value; currentCol++) {
-      if (!gridStructure.value[currentRow][currentCol].isHole) {
-        let holeCount = 0;
-        const adjacentCells = getAdjacentCells(currentRow, currentCol);
+  for (let rowCoordinate = 0; rowCoordinate < rows.value; rowCoordinate++) {
+    for (let colCoordinate = 0; colCoordinate < cols.value; colCoordinate++) {
+      if (!gridStructure.value[rowCoordinate][colCoordinate].isHole) {
+        const countOfAdjacentHols = getAdjacentHoles(rowCoordinate, colCoordinate);
 
-        adjacentCells.forEach((cell, i) => {
-          if (adjacentCells[i].isHole) {
-            holeCount++;
-          }
-        });
-
-        gridStructure.value[currentRow][currentCol].value = holeCount;
+        gridStructure.value[rowCoordinate][colCoordinate].value = countOfAdjacentHols;
       }
     }
   }
 };
 
-const getAdjacentCells = (currentRow, currentCol) => {
-  const results = [];
+const getAdjacentHoles = (rowCoordinate, colCoordinate) => {
+  if (rowCoordinate < 0 || rowCoordinate >= rows.value || colCoordinate < 0 || colCoordinate >= cols.value) return;
 
-  for (
-    let rowPos = currentRow > 0 ? -1 : 0;
-    rowPos <= (currentRow < rows.value - 1 ? 1 : 0);
-    rowPos++
-  ) {
-    for (
-      let colPos = currentCol > 0 ? -1 : 0;
-      colPos <= (currentCol < cols.value - 1 ? 1 : 0);
-      colPos++
-    ) {
-      results.push(gridStructure.value[currentRow + rowPos][currentCol + colPos]);
-    }
+  let foundedHoles = 0;
+
+  foundedHoles += checkCell(rowCoordinate - 1, colCoordinate - 1);
+  foundedHoles += checkCell(rowCoordinate - 1, colCoordinate);
+  foundedHoles += checkCell(rowCoordinate - 1, colCoordinate + 1);
+
+  foundedHoles += checkCell(rowCoordinate, colCoordinate - 1);
+  foundedHoles += checkCell(rowCoordinate, colCoordinate + 1);
+
+  foundedHoles += checkCell(rowCoordinate + 1, colCoordinate - 1);
+  foundedHoles += checkCell(rowCoordinate + 1, colCoordinate);
+  foundedHoles += checkCell(rowCoordinate + 1, colCoordinate + 1);
+
+  return foundedHoles;
+};
+
+const checkCell = (rowCoordinate, colCoordinate) => {
+  if (rowCoordinate < 0 || rowCoordinate >= rows.value || colCoordinate < 0 || colCoordinate >= cols.value) {
+    return 0;
   }
 
-  return results;
+  return holesCoordination.value.includes(`${rowCoordinate}-${colCoordinate}`) ? 1 : 0;
 };
 
 const handleClick = (cell) => {
@@ -97,19 +105,18 @@ onMounted(() => {
   <header>MineSweeper</header>
 
   <main>
-    <code>
-      {{ gridStructure }}
-    </code>
-
     <v-row
       v-for="(row, i) in gridStructure"
       :key="i"
       no-gutters
+      dense
     >
-      <v-col v-for="(cell, index) in row" :key="index">
+      <v-col v-for="cell in row" :key="cell.id">
         <v-sheet
-          class="d-flex align-center justify-center pa-2 ma-2"
+          class="d-flex align-center justify-center pa-2 ma-0 font-weight-bold"
           border
+          min-width="90"
+          min-height="50"
           @click="handleClick(cell)"
         >
           {{ cell.value }}
