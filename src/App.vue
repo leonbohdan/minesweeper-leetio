@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue';
 const gridStructure = ref([]);
 
 const cellModel = ref({
-  value: 2,
+  value: 0,
   isHole: false,
 });
 
@@ -22,15 +22,38 @@ const fillGridStructure = () => {
   }
 };
 
-onMounted(() => {
-  fillGridStructure();
+const assignHoles = () => {
+  let assignedHoles = 0;
+
+  while (assignedHoles < holes.value) {
+    const rowRandomIndex = Math.floor(Math.random() * rows.value);
+    const colRandomIndex = Math.floor(Math.random() * cols.value);
+
+    const randomCell = gridStructure.value[rowRandomIndex][colRandomIndex];
+
+    if (!randomCell.isHole) {
+      gridStructure.value[rowRandomIndex][colRandomIndex] = {
+        isHole: true,
+        value: 'H',
+      };
+
+      assignedHoles++;
+    }
+  }
+};
+
+onMounted(async () => {
+  await fillGridStructure();
+  assignHoles();
 });
 </script>
 
 <template>
   <header>MineSweeper</header>
 
-  <main>main</main>
+  <main>
+    {{ gridStructure }}
+  </main>
 </template>
 
 <style scoped>
